@@ -4,11 +4,14 @@ import android.Manifest.permission.CALL_PHONE
 import android.content.Intent
 import android.content.Intent.ACTION_CALL
 import android.content.Intent.ACTION_DIAL
+import android.content.Intent.ACTION_PICK
+import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -39,6 +42,21 @@ class MainActivity : AppCompatActivity() {
                 callPhone(true)
             } else {
                 Toast.makeText(this, "Permission Deined", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private val pickImageActivityResult: ActivityResultLauncher<Intent> by lazy {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            with(result) {
+                if (resultCode == RESULT_OK) {
+                    data?.data?.also {
+                        activityMainBinding.parameterTv.text = it.toString()
+                        startActivity(Intent(ACTION_VIEW).apply {
+                            data = it
+                        })
+                    }
+                }
             }
         }
     }
@@ -88,7 +106,7 @@ class MainActivity : AppCompatActivity() {
 
             R.id.viewMi -> {
                 val url = Uri.parse(activityMainBinding.parameterTv.text.toString())
-                val browserIntent = Intent(Intent.ACTION_VIEW, url)
+                val browserIntent = Intent(ACTION_VIEW, url)
                 startActivity(browserIntent)
                 true
             }
@@ -112,6 +130,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.pickMi -> {
+                val imageDir =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).path
+                pickImageActivityResult.launch(Intent(ACTION_PICK).apply {
+                    setDataAndType(Uri.parse(imageDir), "image/*")
+                })
                 true
             }
 
