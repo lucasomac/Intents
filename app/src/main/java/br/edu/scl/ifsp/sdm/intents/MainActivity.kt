@@ -63,7 +63,10 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.openActivityMi -> {
-
+                val parameterIntent = Intent("OPEN_PARAMETER_ACTIVITY").apply {
+                    putExtra(PARAMETER_EXTRA, activityMainBinding.parameterTv.text.toString())
+                }
+                parameterResultLauncher.launch(parameterIntent)
                 true
             }
 
